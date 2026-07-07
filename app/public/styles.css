@@ -1,0 +1,57 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f6f8; color: #1f2329; }
+.screen { min-height: 100vh; }
+.card { max-width: 360px; margin: 12vh auto; background: #fff; padding: 28px; border-radius: 14px; box-shadow: 0 6px 24px rgba(0,0,0,.08); }
+.card h1 { margin: 0 0 4px; font-size: 26px; }
+.sub { color: #8a9099; margin: 0 0 18px; font-size: 13px; }
+.tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+.tabs button, .tabs2 button { flex: 1; padding: 8px; border: 1px solid #e3e6eb; background: #fff; border-radius: 8px; cursor: pointer; }
+.tabs button.active, .tabs2 button.active { background: #2f6bff; color: #fff; border-color: #2f6bff; }
+input, textarea, select { width: 100%; padding: 9px 10px; margin-bottom: 10px; border: 1px solid #e3e6eb; border-radius: 8px; font-size: 14px; }
+button { font-size: 14px; }
+#li-submit, #modal-save { width: 100%; padding: 10px; background: #2f6bff; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
+.msg { color: #e54545; font-size: 13px; min-height: 18px; }
+
+header { display: flex; align-items: center; gap: 16px; padding: 12px 18px; background: #fff; border-bottom: 1px solid #e3e6eb; }
+.brand { font-weight: 700; font-size: 18px; }
+.conn { display: flex; align-items: center; gap: 8px; flex: 1; }
+.conn input[type=text], #connUrl { max-width: 320px; margin: 0; }
+.conn .off { font-size: 13px; color: #555; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: #bbb; }
+.dot.online { background: #28c76f; }
+.dot.offline { background: #e54545; }
+.dot.syncing { background: #ffab00; }
+.user { display: flex; align-items: center; gap: 10px; }
+.user button { padding: 6px 10px; border: 1px solid #e3e6eb; background: #fff; border-radius: 8px; cursor: pointer; }
+#btn-edit { background: #eef2ff; border-color: #c9d6ff; color: #2f6bff; }
+
+.layout { display: flex; min-height: calc(100vh - 58px); }
+#moduleTabs { width: 180px; padding: 16px 10px; background: #fff; border-right: 1px solid #e3e6eb; display: flex; flex-direction: column; gap: 8px; }
+#moduleTabs button { text-align: left; padding: 10px 12px; border: 1px solid transparent; background: transparent; border-radius: 8px; cursor: pointer; font-size: 15px; }
+#moduleTabs button.active { background: #eef2ff; border-color: #c9d6ff; color: #2f6bff; font-weight: 600; }
+#moduleContent { flex: 1; padding: 22px 26px; overflow: auto; }
+.module-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.module-head h2 { margin: 0; font-size: 20px; }
+
+.panel { background: #fff; border: 1px solid #eef0f3; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.row > * { margin-bottom: 0; }
+.row input, .row select { width: auto; flex: 1; min-width: 120px; }
+.row button { padding: 9px 14px; background: #2f6bff; color: #fff; border: none; border-radius: 8px; cursor: pointer; white-space: nowrap; }
+
+.list { display: flex; flex-direction: column; gap: 8px; }
+.item { background: #fff; border: 1px solid #eef0f3; border-radius: 10px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.item .meta { color: #8a9099; font-size: 12px; }
+.item .del { color: #e54545; cursor: pointer; border: none; background: none; font-size: 13px; }
+.badge { font-size: 11px; padding: 2px 7px; border-radius: 20px; background: #e8f5ee; color: #1a9e5a; }
+.badge.priv { background: #fdeaea; color: #e54545; }
+.empty { color: #8a9099; text-align: center; padding: 30px; }
+
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; }
+.modal-card { background: #fff; border-radius: 14px; padding: 22px; width: 380px; }
+.modal-card h3 { margin: 0 0 4px; }
+.opt { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f0f1f3; }
+.opt input { width: auto; margin: 0; }
+.modal .row { justify-content: flex-end; margin-top: 14px; }
+.modal .row button { width: auto; }
+#modal-cancel { background: #fff; color: #555; border: 1px solid #e3e6eb; }

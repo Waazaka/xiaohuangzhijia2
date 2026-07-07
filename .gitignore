@@ -1,0 +1,4 @@
+# 项目数据（自动生成，可安全删除，不入库）
+.workbuddy/
+app/data/
+node_modules/

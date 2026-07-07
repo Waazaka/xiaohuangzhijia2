@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HomeFrame · 模块化家庭应用</title>
+  <link rel="stylesheet" href="/public/styles.css">
+</head>
+<body>
+  <!-- 登录 / 注册 -->
+  <div id="login" class="screen">
+    <div class="card">
+      <h1>🏠 HomeFrame</h1>
+      <p class="sub">模块化个人家庭应用 · 本地部署</p>
+      <div class="tabs">
+        <button id="tab-login" class="active">登录</button>
+        <button id="tab-register">注册</button>
+      </div>
+      <input id="li-username" placeholder="用户名">
+      <input id="li-password" type="password" placeholder="密码">
+      <input id="li-displayName" placeholder="昵称（仅注册）" style="display:none">
+      <input id="li-deviceName" placeholder="设备名（如：手机）" value="Web">
+      <button id="li-submit">登录</button>
+      <div id="li-msg" class="msg"></div>
+    </div>
+  </div>
+
+  <!-- 主应用 -->
+  <div id="app" class="screen" style="display:none">
+    <header>
+      <div class="brand">🏠 HomeFrame</div>
+      <div class="conn">
+        <input id="connUrl" placeholder="连接地址（局域网/VPS/域名）">
+        <label class="off"><input type="checkbox" id="connOffline"> 离线</label>
+        <span id="connStatus" class="dot" title="同步状态"></span>
+      </div>
+      <div class="user">
+        <span id="userName"></span>
+        <button id="btn-edit">⚙ 看板</button>
+        <button id="btn-logout">退出</button>
+      </div>
+    </header>
+    <div class="layout">
+      <nav id="moduleTabs"></nav>
+      <main id="moduleContent"></main>
+    </div>
+  </div>
+
+  <!-- 编辑看板弹窗 -->
+  <div id="modal" class="modal" style="display:none">
+    <div class="modal-card">
+      <h3>编辑看板模块</h3>
+      <p class="sub">勾选要显示的功能模块，顺序即排列顺序。</p>
+      <div id="moduleOptions"></div>
+      <div class="row">
+        <button id="modal-save">保存</button>
+        <button id="modal-cancel">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/public/app.js"></script>
+</body>
+</html>

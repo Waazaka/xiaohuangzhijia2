@@ -18,7 +18,7 @@
  * 若已连接 Android 设备，脚本会尝试自动 `adb install` 装到手机。
  */
 import { execSync, spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -94,6 +94,21 @@ function checkAndroidSdk() {
   return true;
 }
 
+// ---------- Android 明文流量配置 ----------
+// Android 9+ 默认拦截明文 HTTP。家庭服务器常跑在局域网 http://，此处默认开启
+// usesCleartextTraffic，让用户出包后无需手动改原生工程即可连接；若家庭服务器已用
+// HTTPS（如 Cloudflare 隧道），可注释本调用以收紧安全。
+function patchAndroidManifest() {
+  const manifest = join(__dirname, 'android', 'app', 'src', 'main', 'AndroidManifest.xml');
+  if (!existsSync(manifest)) { warn(`未找到 AndroidManifest（${manifest}），跳过明文配置`); return; }
+  let xml = readFileSync(manifest, 'utf8');
+  if (xml.includes('usesCleartextTraffic')) { ok('AndroidManifest 已含 usesCleartextTraffic，跳过'); return; }
+  const patched = xml.replace(/<application(\s[^>]*)?>/, '<application android:usesCleartextTraffic="true"$1>');
+  if (patched === xml) { warn('未在 AndroidManifest 中找到 <application> 标签，跳过明文配置'); return; }
+  writeFileSync(manifest, patched, 'utf8');
+  ok('已开启 android:usesCleartextTraffic（允许连接局域网 HTTP 家庭服务器）');
+}
+
 // ---------- 主流程 ----------
 function main() {
   const arg = (process.argv[2] || 'android').toLowerCase();
@@ -155,6 +170,12 @@ function main() {
     process.exit(1);
   }
   ok('Web 资源已同步');
+
+  // 4.5 开启 Android 明文流量（允许连接局域网 HTTP 家庭服务器）
+  if (target === 'android') {
+    step('配置 Android 明文流量');
+    patchAndroidManifest();
+  }
 
   // 5. 构建
   step(`构建 ${target}（生成安装包）`);

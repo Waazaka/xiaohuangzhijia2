@@ -55,3 +55,37 @@ header { display: flex; align-items: center; gap: 16px; padding: 12px 18px; back
 .modal .row { justify-content: flex-end; margin-top: 14px; }
 .modal .row button { width: auto; }
 #modal-cancel { background: #fff; color: #555; border: 1px solid #e3e6eb; }
+
+/* ---- 移动端适配（≤640px）---- */
+@media (max-width: 640px) {
+  .card { margin: 6vh auto; padding: 20px; border-radius: 12px; }
+  .card h1 { font-size: 22px; }
+
+  /* 顶部：连接设置换行占满整行，品牌与用户按钮留在第一行 */
+  header { flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
+  .brand { font-size: 16px; }
+  #btn-edit, .user button { padding: 5px 9px; font-size: 13px; }
+  .user { margin-left: auto; }
+  .conn { order: 3; flex-basis: 100%; }
+  .conn input[type=text], #connUrl { max-width: none; width: 100%; }
+
+  /* 侧边栏改为顶部横向滑动标签栏 */
+  .layout { flex-direction: column; min-height: calc(100vh - 104px); }
+  #moduleTabs {
+    width: auto; flex-direction: row; overflow-x: auto;
+    border-right: none; border-bottom: 1px solid #e3e6eb;
+    padding: 8px; gap: 6px; -webkit-overflow-scrolling: touch;
+  }
+  #moduleTabs button { white-space: nowrap; padding: 8px 12px; font-size: 14px; }
+  #moduleContent { padding: 14px; }
+
+  /* 弹窗与面板在窄屏不溢出 */
+  .modal-card { width: auto; max-width: calc(100vw - 32px); }
+  .panel { padding: 14px; }
+  .module-head { flex-wrap: wrap; gap: 8px; }
+  .row input, .row select { min-width: 96px; }
+
+  /* 列表项长文本可换行，避免横向溢出 */
+  .item { flex-wrap: wrap; }
+  .item > div { min-width: 0; overflow-wrap: anywhere; }
+}

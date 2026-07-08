@@ -8,8 +8,10 @@
   let storeData = {};          // collection -> { entityId -> entity(含 scopeId) }
   let outbox = [];             // 待推送操作
   let since = 0;               // 已拉取到的 serverSeq 游标
-  let endpoint = location.origin;
-  let offline = false;
+  const IS_NATIVE = !!(typeof window !== 'undefined' && window.Capacitor); // 在 Capacitor 原生壳内运行
+  let endpoint = localStorage.getItem(LS.endpoint) || (IS_NATIVE ? '' : location.origin);
+  let offlineManual = localStorage.getItem(LS.offline) === '1';
+  let offline = offlineManual || !navigator.onLine;
   let modulesList = [];        // 全部模块元信息
   let layoutArr = [];          // 当前看板布局（模块 id 顺序）
   let current = '';            // 当前激活模块
@@ -21,8 +23,9 @@
     try { storeData = JSON.parse(localStorage.getItem(LS.store) || '{}'); } catch (e) {}
     try { outbox = JSON.parse(localStorage.getItem(LS.outbox) || '[]'); } catch (e) {}
     since = +localStorage.getItem(LS.since) || 0;
-    offline = localStorage.getItem(LS.offline) === '1';
-    endpoint = localStorage.getItem(LS.endpoint) || location.origin;
+    offlineManual = localStorage.getItem(LS.offline) === '1';
+    offline = offlineManual || !navigator.onLine;
+    endpoint = localStorage.getItem(LS.endpoint) || (IS_NATIVE ? '' : location.origin);
   }
   function save() {
     localStorage.setItem(LS.store, JSON.stringify(storeData));
@@ -36,6 +39,7 @@
   // ---------- API ----------
   async function api(method, path, body) {
     if (offline) throw new Error('offline');
+    if (!endpoint) throw new Error('请先在「连接设置」填写家庭服务器地址（局域网/VPS/域名）');
     const opt = { method, headers: { 'Content-Type': 'application/json' } };
     if (session) opt.headers['Authorization'] = 'Bearer ' + session.token;
     if (body) opt.body = JSON.stringify(body);
@@ -388,11 +392,26 @@
   };
 
   // ---------- 连接设置 / 退出 ----------
-  $('connOffline').onchange = (e) => { offline = e.target.checked; localStorage.setItem(LS.offline, offline ? '1' : '0'); setStatus(offline ? 'offline' : 'online'); if (!offline) triggerSync(); };
-  $('connUrl').onchange = (e) => { endpoint = e.target.value.trim() || location.origin; localStorage.setItem(LS.endpoint, endpoint); triggerSync(); };
+  $('connOffline').onchange = (e) => { offlineManual = e.target.checked; offline = offlineManual || !navigator.onLine; localStorage.setItem(LS.offline, offlineManual ? '1' : '0'); setStatus(offline ? 'offline' : 'online'); if (!offline) triggerSync(); };
+  $('connUrl').onchange = (e) => { endpoint = e.target.value.trim() || (IS_NATIVE ? '' : location.origin); localStorage.setItem(LS.endpoint, endpoint); if (!endpoint) { setStatus('offline'); return; } triggerSync(); };
   $('btn-logout').onclick = () => { if (syncTimer) clearInterval(syncTimer); session = null; localStorage.removeItem(LS.session); $('app').style.display = 'none'; showLogin(); };
+
+  // ---------- PWA：注册 service worker（仅网页/HTTPS 下有效；原生壳用自带 WebView 离线） ----------
+  if (!IS_NATIVE && 'serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js', { scope: '/' }).catch(() => {});
+    });
+  }
+
+  // 自动感知网络：断网即离线（数据留本地），恢复即同步
+  window.addEventListener('offline', () => { offline = true; setStatus('offline'); });
+  window.addEventListener('online', () => { offline = offlineManual; setStatus(offline ? 'offline' : 'online'); if (!offline) triggerSync(); });
 
   // ---------- 启动 ----------
   load();
   if (session) enterApp(); else showLogin();
+  if (IS_NATIVE && !endpoint) {
+    const c = $('connUrl'); if (c) { c.scrollIntoView({ behavior: 'smooth' }); c.focus(); }
+    const m = $('li-msg'); if (m) m.textContent = '请先在「连接设置」填写家庭服务器地址（局域网/VPS/域名）';
+  }
 })();

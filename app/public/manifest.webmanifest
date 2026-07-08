@@ -1,0 +1,20 @@
+{
+  "name": "HomeFrame 家庭应用",
+  "short_name": "HomeFrame",
+  "description": "模块化个人家庭应用：看板、账本、备忘录、任务、推送",
+  "lang": "zh-CN",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#185FA5",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

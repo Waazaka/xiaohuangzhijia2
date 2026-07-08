@@ -34,7 +34,7 @@ node server.js            # 默认端口 8787，可用 PORT=9000 node server.js 
 
 ```
 app/
-  server.js          HTTP 服务与路由
+  server.js          HTTP 服务与路由（含 PWA 资源路由）
   lib/store.js       本地存储
   lib/auth.js        账户/会话/设备/密码哈希
   lib/permissions.js 基于 scope 的读写权限
@@ -42,9 +42,40 @@ app/
   lib/modules.js     模块注册表
   modules/           family / ledger / memo / task / push
   public/            index.html / styles.css / app.js（看板前端）
+    manifest.webmanifest   PWA 清单
+    service-worker.js      离线应用壳缓存
+    icon.svg               PWA 图标
   test_smoke.js      端到端冒烟测试
   data/              运行时数据（自动生成，可删除）
 ```
+
+## 打包为可安装应用（PWA）
+
+已内置 PWA 支持，零原生构建即可安装到桌面与手机主屏：
+
+- `public/manifest.webmanifest`：应用名、图标、`standalone` 全屏展示。
+- `public/service-worker.js`：缓存应用壳（首页/JS/CSS/图标），**断网也能打开**；API 读取网络优先、失败回退缓存。
+- `public/icon.svg`：单一 SVG 图标（同时用于 `any` 与 `maskable`）。
+
+**安装方式：**
+- 桌面 Chrome / Edge：地址栏右侧「安装应用」图标，或菜单 → 应用 → 安装 HomeFrame。
+- 手机：浏览器打开后「添加到主屏幕」，即生成可离线启动的 App 图标。
+
+> 图标目前是 SVG。如需上架应用商店或追求最大兼容性，可用工具（如 `pwa-asset-generator`）把 `icon.svg` 转成 192/512 的 PNG，并补充到 manifest 的 `icons` 数组。
+
+## 手机原生壳（Capacitor，真离线）
+
+PWA 的离线依赖 Service Worker，而 SW 只在 `https://` / `localhost` 注册；纯局域网 HTTP 下离线打不开。要"零网络首次启动即可用"，用 Capacitor 把前端打进原生 App 包：UI 与本地数据随包安装，不依赖 SW/HTTPS。详见 `app/mobile/README.md`。
+
+```bash
+cd app/mobile && npm install && npx cap add android && npx cap sync && npx cap open android
+```
+
+前端已做原生适配：`window.Capacitor` 存在时不再把 `location.origin` 当服务器（那是 App 本地地址），而改用「连接设置」里填写的家庭服务器地址；并自动感知网络断/通。
+
+## CORS
+
+`server.js` 已对 API 与静态资源加 `Access-Control-Allow-Origin`（回显请求方 Origin），支持原生 App / 跨域前端调用。生产如需收紧，可把 `corsHeaders()` 改为固定白名单。
 
 ## API 摘要
 

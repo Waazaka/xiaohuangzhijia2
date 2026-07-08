@@ -15,8 +15,19 @@ store.load();
 const PORT = process.env.PORT || 8787;
 const PUBLIC_DIR = path.join(__dirname, 'public');
 
+let _req = null;
+function corsHeaders(req) {
+  const origin = (req && req.headers && req.headers.origin) || '*';
+  return {
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+  };
+}
 function send(res, code, obj) {
-  res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8' });
+  const h = { 'Content-Type': 'application/json; charset=utf-8' };
+  if (_req) Object.assign(h, corsHeaders(_req));
+  res.writeHead(code, h);
   res.end(JSON.stringify(obj));
 }
 
@@ -49,20 +60,36 @@ function familyView(accountId) {
 }
 
 const server = http.createServer(async (req, res) => {
+  _req = req;
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204, corsHeaders(req));
+    return res.end();
+  }
   let pathname;
   try { pathname = decodeURIComponent(url.parse(req.url).pathname); }
   catch { pathname = url.parse(req.url).pathname; }
 
-  // ---- 静态资源 ----
-  if (req.method === 'GET' && (pathname === '/' || pathname.startsWith('/public/'))) {
-    const rel = pathname === '/' ? 'index.html' : pathname.replace(/^\/public\//, '');
+  // ---- 静态资源 + PWA ----
+  if (req.method === 'GET' && (pathname === '/' || pathname.startsWith('/public/') ||
+      pathname === '/manifest.webmanifest' || pathname === '/service-worker.js' ||
+      ['/app.js', '/styles.css', '/icon.svg'].includes(pathname))) {
+    const rel = pathname === '/' ? 'index.html'
+      : pathname.startsWith('/public/') ? pathname.replace(/^\/public\//, '')
+      : pathname.replace(/^\//, '');
     const f = path.join(PUBLIC_DIR, rel);
     if (!f.startsWith(PUBLIC_DIR)) return send(res, 403, { error: 'forbidden' });
     fs.readFile(f, (e, data) => {
       if (e) return send(res, 404, { error: 'not found' });
       const ext = path.extname(f);
-      const ct = { '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css' }[ext] || 'text/plain';
-      res.writeHead(200, { 'Content-Type': ct + '; charset=utf-8' });
+      const ct = {
+        '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css',
+        '.json': 'application/json', '.webmanifest': 'application/manifest+json',
+        '.svg': 'image/svg+xml'
+      }[ext] || 'text/plain';
+      const headers = { 'Content-Type': ct + '; charset=utf-8' };
+      Object.assign(headers, corsHeaders(req));
+      if (pathname === '/service-worker.js') headers['Service-Worker-Allowed'] = '/';
+      res.writeHead(200, headers);
       res.end(data);
     });
     return;

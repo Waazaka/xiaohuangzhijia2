@@ -1,0 +1,23 @@
+{
+  "name": "homeframe-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "HomeFrame 手机原生壳（Capacitor 包装现有 Web 前端，离线可用）",
+  "scripts": {
+    "sync": "cap sync",
+    "android": "cap add android && cap sync",
+    "ios": "cap add ios && cap sync",
+    "open:android": "cap open android",
+    "open:ios": "cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.1.0",
+    "@capacitor/android": "^6.1.0",
+    "@capacitor/ios": "^6.1.0",
+    "@capacitor/network": "^6.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.0"
+  }
+}

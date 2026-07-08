@@ -1,7 +1,60 @@
 # 模块化个人家庭应用 · 系统架构设计
 
-> 版本：v1.0 ｜ 场景：本地服务器后端 + 多连接方式 + 可组合看板
+> 版本：v1.0.0 ｜ 场景：本地服务器后端 + 多连接方式 + 可组合看板
 > 核心目标：一套**可离线、可多端、可组合模块**的家庭数据中心，部署在用户自有服务器上，数据主权归用户。
+
+---
+
+## 项目门户
+
+**HomeFrame** 是一个模块化个人家庭应用：后端部署在你自家的服务器（NAS / 迷你主机 / 树莓派），前端是组合式看板，家庭成员多设备实时同步，断网也能用。
+
+### ✨ 核心特性
+- **自托管、数据主权归你**：后端跑在自己机器，不在任何第三方云。
+- **四种连接自由切换**：局域网直连 / Cloudflare 隧道 / VPS 反代 / 离线本地——差异只在「连哪个 URL」，同步协议统一。
+- **多设备实时同步**：登录即同步，每 10 秒持续同步，离线写入本地队列，恢复后自动回放。
+- **组合式看板**：自由搭模块（看板+账本、+备忘录、+任务…），新增模块零侵入核心。
+- **五大模块**：家庭 / 账本（个人+家庭）/ 备忘录（个人+家庭）/ 任务（定时+重复+分配）/ 推送。
+- **多形态客户端**：可装成 PWA，也能打包成手机原生 App（Capacitor）。
+
+### 🚀 快速开始
+
+**① Web 版（看效果，零依赖）**
+```bash
+cd app
+node server.js          # 打开 http://localhost:8787
+```
+> Windows 可直接双击 `app/start-web.cmd`。
+
+**② 装成 PWA（桌面 / 手机「添加到主屏幕」）**
+手机需用 **HTTPS** 访问（如 Cloudflare 隧道）才能注册 Service Worker 实现离线；局域网纯 HTTP 下 PWA 离线不可用。
+
+**③ 打包手机原生 App（真正离线可用，推荐手机使用）**
+```bash
+cd app/mobile
+node build.js           # 一键出 APK（或双击 build.cmd）
+```
+首次需装 **JDK 17+** 与 **Android SDK**（脚本检测到缺哪个会停下给链接）。详见 [`app/mobile/README.md`](app/mobile/README.md)。
+
+### 📁 目录结构
+```
+.
+├── design/架构设计.md        # 详细架构设计（同步引擎、权限、模块框架）
+├── app/
+│   ├── server.js             # 后端 HTTP 服务 + 同步引擎 + 路由（零外部依赖）
+│   ├── lib/                  # store / auth / permissions / sync / modules
+│   ├── modules/              # family / ledger / memo / task / push
+│   ├── public/               # 看板前端 SPA（含 PWA manifest + service worker）
+│   ├── mobile/               # Capacitor 手机原生壳 + 一键构建脚本
+│   └── README.md             # 后端与前端运行说明
+└── README.md                 # 本文件（项目门户 + 架构总览）
+```
+
+### 🔗 文档
+- 详细架构设计 → [`design/架构设计.md`](design/架构设计.md)
+- 后端 / 前端运行 → [`app/README.md`](app/README.md)
+- 手机原生打包 → [`app/mobile/README.md`](app/mobile/README.md)
+- 版本发布：**[`v1.0.0`](https://github.com/Waazaka/xiaohuangzhijia2/releases/tag/v1.0.0)**
 
 ---
 
